@@ -15,9 +15,25 @@
     "dist"
   ],
   "sideEffects": false,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/korial29/form-control-mixin.git"
+  },
+  "homepage": "https://korial29.github.io/form-control-mixin/",
+  "bugs": {
+    "url": "https://github.com/korial29/form-control-mixin/issues"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "lint:prettier": "prettier --check \"**/*.{js,ts,mjs}\"",
+    "lint:eslint": "eslint .",
+    "lint:tsc": "tsc --noEmit",
+    "lint": "npm run lint:prettier && npm run lint:eslint && npm run lint:tsc",
+    "format:prettier": "prettier \"**/*.{js,ts,mjs}\" --write",
+    "format:eslint": "eslint . --fix",
+    "format": "npm run format:prettier && npm run format:eslint",
     "test": "web-test-runner",
+    "test:ci": "web-test-runner",
     "test:watch": "web-test-runner --watch",
     "prepublishOnly": "npm run build && npm test"
   },
@@ -29,11 +45,17 @@
     "form-validation"
   ],
   "license": "MIT",
-  "author": "",
+  "author": "Ludovic Dupont",
   "devDependencies": {
+    "@open-wc/eslint-config": "^13.1.0",
     "@web/dev-server-esbuild": "^1.0.2",
     "@web/test-runner": "^0.19.0",
     "@web/test-runner-playwright": "^0.11.0",
-    "typescript": "^5.6.0"
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-prettier": "^5.0.0",
+    "prettier": "^3.9.4",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.0.0"
   }
 }

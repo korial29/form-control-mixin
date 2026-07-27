@@ -95,7 +95,27 @@ npm run build
 npx http-server . -o /demo/
 ```
 
+## Contributing
+
+Single-branch model on `master` (same conventions as
+[`lit-pdf-viewer`](https://github.com/korial29/lit-pdf-viewer)):
+
+- Branch off `master` (`feature/*`, `fix/*`, `chore/*`), open the PR back into `master`.
+- Add exactly one release label: `release:major`, `release:minor`, `release:patch`,
+  or `release:skip`. Enforced by `pr-validation.yml`.
+- Merging a `release:*` PR (not `skip`) proposes a release via `release.yml` — tag,
+  npm publish, GitHub Release — gated behind a manual approval (`release`
+  environment). `package.json`'s `version` is just a baseline; the real next
+  version comes from the latest git tag.
+
+Before opening a PR: `npm run lint && npm run build && npm run test:ci` (exactly
+what CI runs).
+
 ## Status
 
-Early (`0.1.0`). Core mixin + built-in validators + cross-browser test suite
+Early (`0.1.0`). Core mixin, built-in validators, and a cross-browser test suite
 are in place. Not yet published to npm.
+
+⚠ To actually publish, the GitHub repo needs an `NPM_PUBLISH_TOKEN` secret and a
+`release` environment (with required reviewers) configured manually — that part
+can't be done from here.

@@ -1,0 +1,53 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build library
+        run: npm run build
+
+      - name: Assemble demo site
+        run: |
+          mkdir -p site
+          cp -r dist site/dist
+          cp demo/index.html site/index.html
+          # The source demo imports from "../dist/..." (demo/ is a sibling of
+          # dist/ in the repo). Deployed, both live at site root, so rewrite
+          # the import path for this copy only.
+          sed -i 's#\.\./dist/#./dist/#' site/index.html
+
+      - name: Deploy to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout --orphan gh-pages-new
+          git rm -rf .
+          cp -r site/* .
+          rm -rf site
+          git add .
+          git commit -m "Deploy from master: ${{ github.sha }}"
+          git push -f origin gh-pages-new:gh-pages

@@ -131,7 +131,10 @@ export function FormControlMixin<T extends Constructor<HTMLElement>>(
             typeof validator.message === 'function'
               ? validator.message(this as unknown as HTMLElement)
               : validator.message;
-          this.setValidity({ [validator.key]: true }, message);
+          this.setValidity(
+            { [validator.key]: true } as Partial<ValidityStateFlags>,
+            message,
+          );
           return;
         }
       }
