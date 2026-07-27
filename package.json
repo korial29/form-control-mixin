@@ -1,0 +1,39 @@
+{
+  "name": "form-control-mixin",
+  "version": "0.1.0",
+  "description": "Framework-agnostic mixin for building form-associated custom elements on top of the native ElementInternals API.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "web-test-runner",
+    "test:watch": "web-test-runner --watch",
+    "prepublishOnly": "npm run build && npm test"
+  },
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "form-associated",
+    "elementinternals",
+    "form-validation"
+  ],
+  "license": "MIT",
+  "author": "",
+  "devDependencies": {
+    "@web/dev-server-esbuild": "^1.0.2",
+    "@web/test-runner": "^0.19.0",
+    "@web/test-runner-playwright": "^0.11.0",
+    "typescript": "^5.6.0"
+  }
+}

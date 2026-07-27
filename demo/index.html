@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>form-control-mixin demo</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        max-width: 32rem;
+        margin: 3rem auto;
+      }
+      demo-input {
+        display: block;
+        margin-block-end: 1rem;
+      }
+      demo-input:invalid {
+        outline: 2px solid crimson;
+      }
+      pre {
+        background: #f3f3f3;
+        padding: 1rem;
+        border-radius: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>form-control-mixin</h1>
+    <p>
+      <code>&lt;demo-input&gt;</code> is a plain <code>HTMLElement</code> (no
+      framework) that fully participates in the form below: it submits its
+      value, resets with the form, and reports native validity &mdash; all via
+      <code>ElementInternals</code>.
+    </p>
+
+    <form id="demo-form">
+      <label>
+        Nickname (required, 3-10 chars)
+        <demo-input name="nickname" placeholder="e.g. ludo"></demo-input>
+      </label>
+      <button type="submit">Submit</button>
+      <button type="reset">Reset</button>
+    </form>
+
+    <pre id="output">Submitted values will appear here.</pre>
+
+    <script type="module">
+      import {
+        FormControlMixin,
+        requiredValidator,
+        minLengthValidator,
+        maxLengthValidator,
+      } from '../dist/index.js';
+
+      class DemoInput extends FormControlMixin(HTMLElement, {
+        validators: [requiredValidator, minLengthValidator(3), maxLengthValidator(10)],
+      }) {
+        static observedAttributes = ['placeholder'];
+
+        #input = document.createElement('input');
+
+        connectedCallback() {
+          const root = this.attachShadow({ mode: 'open' });
+          root.appendChild(this.#input);
+          this.#input.addEventListener('input', () => {
+            this.value = this.#input.value;
+            this.requestValidation();
+            this.reportValidity();
+          });
+          this.requestValidation();
+        }
+
+        attributeChangedCallback(name, _old, value) {
+          if (name === 'placeholder') this.#input.placeholder = value ?? '';
+        }
+
+        get value() {
+          return this.#input.value;
+        }
+
+        set value(v) {
+          this.#input.value = v ?? '';
+        }
+
+        formResetCallback() {
+          this.value = '';
+          this.requestValidation();
+        }
+      }
+
+      customElements.define('demo-input', DemoInput);
+
+      const form = document.getElementById('demo-form');
+      const output = document.getElementById('output');
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        output.textContent = JSON.stringify(
+          Object.fromEntries(new FormData(form)),
+          null,
+          2,
+        );
+      });
+    </script>
+  </body>
+</html>
