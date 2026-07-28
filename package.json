@@ -47,6 +47,7 @@
   "license": "MIT",
   "author": "Ludovic Dupont",
   "devDependencies": {
+    "@esm-bundle/chai": "^4.3.4-fix.0",
     "@open-wc/eslint-config": "^13.1.0",
     "@web/dev-server-esbuild": "^1.0.2",
     "@web/test-runner": "^0.19.0",
