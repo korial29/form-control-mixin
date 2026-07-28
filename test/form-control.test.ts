@@ -1,9 +1,5 @@
 import { expect } from '@esm-bundle/chai';
-import {
-  FormControlMixin,
-  requiredValidator,
-  minLengthValidator,
-} from '../src/index.js';
+import { FormControlMixin, requiredValidator, minLengthValidator } from '../src/index.js';
 
 class TestInput extends FormControlMixin(HTMLElement, {
   validators: [requiredValidator, minLengthValidator(3)],
@@ -35,7 +31,7 @@ function renderInForm(): { form: HTMLFormElement; input: TestInput } {
 
 describe('FormControlMixin', () => {
   afterEach(() => {
-    document.querySelectorAll('form').forEach((f) => f.remove());
+    document.querySelectorAll('form').forEach(f => f.remove());
   });
 
   it('marks the class as form-associated', () => {

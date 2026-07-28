@@ -1,9 +1,15 @@
 import type { FormValue, Validator } from './types.js';
 
 function toStringValue(value: FormValue): string {
-  if (value == null) return '';
-  if (typeof value === 'string') return value;
-  if (value instanceof File) return value.name;
+  if (value == null) {
+    return '';
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (value instanceof File) {
+    return value.name;
+  }
   return '';
 }
 
@@ -16,7 +22,9 @@ export const requiredValidator: Validator = {
   key: 'valueMissing',
   message: 'Please fill out this field.',
   isValid(_host, value) {
-    if (value instanceof FormData) return true;
+    if (value instanceof FormData) {
+      return true;
+    }
     return toStringValue(value).length > 0;
   },
 };
