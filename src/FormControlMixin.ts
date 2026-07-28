@@ -21,20 +21,13 @@ export interface FormControlInterface {
   readonly willValidate: boolean;
   checkValidity(): boolean;
   reportValidity(): boolean;
-  setValidity(
-    flags: Partial<ValidityStateFlags>,
-    message?: string,
-    anchor?: HTMLElement,
-  ): void;
+  setValidity(flags: Partial<ValidityStateFlags>, message?: string, anchor?: HTMLElement): void;
   /** Re-runs all configured validators and syncs the form value + validity. */
   requestValidation(): void;
   formAssociatedCallback(form: HTMLFormElement | null): void;
   formDisabledCallback(disabled: boolean): void;
   formResetCallback(): void;
-  formStateRestoreCallback(
-    state: string | FormData | null,
-    mode: 'restore' | 'autocomplete',
-  ): void;
+  formStateRestoreCallback(state: string | FormData | null, mode: 'restore' | 'autocomplete'): void;
 }
 
 /**
@@ -104,18 +97,18 @@ export function FormControlMixin<T extends Constructor<HTMLElement>>(
       return this.#internals.reportValidity();
     }
 
-    setValidity(
-      flags: Partial<ValidityStateFlags>,
-      message?: string,
-      anchor?: HTMLElement,
-    ): void {
+    setValidity(flags: Partial<ValidityStateFlags>, message?: string, anchor?: HTMLElement): void {
       const hasFlags = Object.values(flags).some(Boolean);
       // `anchor` is only forwarded when explicitly given: per spec, a
       // non-null anchor must be a shadow-including descendant of the host,
       // and the host itself does not qualify. Omitting it entirely (rather
       // than defaulting to `this`) avoids a NotFoundError in every browser.
       if (anchor) {
-        this.#internals.setValidity(flags as ValidityStateFlags, hasFlags ? message : undefined, anchor);
+        this.#internals.setValidity(
+          flags as ValidityStateFlags,
+          hasFlags ? message : undefined,
+          anchor,
+        );
       } else {
         this.#internals.setValidity(flags as ValidityStateFlags, hasFlags ? message : undefined);
       }
@@ -131,10 +124,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement>>(
             typeof validator.message === 'function'
               ? validator.message(this as unknown as HTMLElement)
               : validator.message;
-          this.setValidity(
-            { [validator.key]: true } as Partial<ValidityStateFlags>,
-            message,
-          );
+          this.setValidity({ [validator.key]: true } as Partial<ValidityStateFlags>, message);
           return;
         }
       }

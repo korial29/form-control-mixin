@@ -64,4 +64,11 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    files: ['test/**/*.ts'],
+    rules: {
+      'no-unused-expressions': 'off',
+      '@typescript-eslint/no-unused-expressions': 'off',
+    },
+  },
 );
