@@ -5,6 +5,9 @@ class TestInput extends FormControlMixin(HTMLElement, {
   validators: [requiredValidator, minLengthValidator(3)],
 }) {
   value = '';
+  disabledCalls: boolean[] = [];
+  restoredState: string | FormData | null = null;
+  restoredMode: 'restore' | 'autocomplete' | null = null;
 
   connectedCallback(): void {
     this.requestValidation();
@@ -13,6 +16,22 @@ class TestInput extends FormControlMixin(HTMLElement, {
   formResetCallback(): void {
     this.value = '';
     this.requestValidation();
+  }
+
+  formDisabledCallback(disabled: boolean): void {
+    this.disabledCalls.push(disabled);
+  }
+
+  formStateRestoreCallback(
+    state: string | FormData | null,
+    mode: 'restore' | 'autocomplete',
+  ): void {
+    this.restoredState = state;
+    this.restoredMode = mode;
+    if (typeof state === 'string') {
+      this.value = state;
+      this.requestValidation();
+    }
   }
 }
 
@@ -79,5 +98,35 @@ describe('FormControlMixin', () => {
   it('exposes the owning form via .form', () => {
     const { form, input } = renderInForm();
     expect(input.form).to.equal(form);
+  });
+
+  it('calls formDisabledCallback when an ancestor fieldset is disabled', () => {
+    const form = document.createElement('form');
+    const fieldset = document.createElement('fieldset');
+    const input = document.createElement('test-input') as TestInput;
+    input.setAttribute('name', 'nickname');
+    fieldset.appendChild(input);
+    form.appendChild(fieldset);
+    document.body.appendChild(form);
+
+    fieldset.disabled = true;
+    expect(input.disabledCalls).to.deep.equal([true]);
+
+    fieldset.disabled = false;
+    expect(input.disabledCalls).to.deep.equal([true, false]);
+  });
+
+  // The browser only invokes formStateRestoreCallback for real bfcache
+  // navigations or autofill, neither of which is reproducible in this test
+  // harness. Invoking it directly still proves the override contract works:
+  // the mixin's default is a no-op, so a subclass relies on its own override
+  // being called with the state/mode it receives.
+  it('restores value via formStateRestoreCallback', () => {
+    const { input } = renderInForm();
+    input.formStateRestoreCallback('abcd', 'restore');
+    expect(input.restoredState).to.equal('abcd');
+    expect(input.restoredMode).to.equal('restore');
+    expect(input.value).to.equal('abcd');
+    expect(input.validity.valid).to.be.true;
   });
 });
