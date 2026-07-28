@@ -107,6 +107,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
       # Source of truth for the released version is the latest git tag.
       # Fall back to package.json the very first time (no tag yet).
       - name: Bump version (${{ needs.prepare.outputs.bump }})
