@@ -361,6 +361,17 @@
             // flips.
             this.#input.addEventListener('blur', () => this.#syncError());
 
+            if (inputType === 'number') {
+              // Chrome/Firefox change a focused number input's value on
+              // wheel scroll. Blurring (rather than preventDefault, which
+              // would also block the page from scrolling past the field)
+              // avoids silently marking the field dirty while the user is
+              // just scrolling the page.
+              this.#input.addEventListener('wheel', () => this.#input.blur(), {
+                passive: true,
+              });
+            }
+
             this.requestValidation();
           }
 
