@@ -6,4 +6,9 @@ export {
   minLengthValidator,
   maxLengthValidator,
   patternValidator,
+  emailValidator,
+  urlValidator,
+  minValidator,
+  maxValidator,
+  stepValidator,
 } from './validators.js';
