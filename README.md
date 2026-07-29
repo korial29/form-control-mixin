@@ -84,9 +84,11 @@ declares (empty, override-friendly) `formAssociatedCallback`,
 ### Built-in validators
 
 `requiredValidator`, `minLengthValidator(n)`, `maxLengthValidator(n)`,
-`patternValidator(regex, message?)` &mdash; mirror native `required`,
-`minlength`, `maxlength`, and `pattern` semantics. Write your own by
-implementing `{ key, message, isValid(host, value) }`.
+`patternValidator(regex, message?)`, `emailValidator`, `urlValidator`,
+`minValidator(n)`, `maxValidator(n)`, `stepValidator(step, base?)` &mdash;
+mirror native `required`, `minlength`, `maxlength`, `pattern`,
+`type="email"`, `type="url"`, `min`, `max`, and `step` semantics. Write your
+own by implementing `{ key, message, isValid(host, value) }`.
 
 ## Demo
 
