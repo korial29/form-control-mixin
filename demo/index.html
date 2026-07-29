@@ -163,6 +163,11 @@
       <p class="intro">
         Each field below is a plain <code>HTMLElement</code> (no framework) fully participating in
         the native form via <code>ElementInternals</code> &mdash; one field per built-in validator.
+        Fields also expose <code>:state(touched)</code>, <code>:state(dirty)</code>, and
+        <code>:state(valid)</code>/<code>:state(invalid)</code> for styling from the outside &mdash;
+        no attribute reflection or JS bookkeeping required. Edit a field to see it tint
+        (<code>dirty</code>); click away from an invalid one to see it turn red
+        (<code>touched</code> + <code>invalid</code>).
       </p>
 
       <form class="card" id="demo-form" novalidate>
@@ -305,8 +310,15 @@
           border-color: var(--accent, #6355ff);
           box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6355ff) 25%, transparent);
         }
-        input.invalid {
+        /* Driven entirely by internals.states — no classList bookkeeping. */
+        :host(:state(invalid)) input {
           border-color: var(--danger, #e0304a);
+        }
+        :host(:state(touched):state(valid)) input {
+          border-color: var(--ok, #1f9d63);
+        }
+        :host(:state(dirty)) input {
+          background: color-mix(in srgb, var(--accent, #6355ff) 6%, var(--card-bg, #fff));
         }
         .error {
           display: block;
@@ -328,7 +340,6 @@
 
           #input = document.createElement('input');
           #error = document.createElement('small');
-          #touched = false;
 
           connectedCallback() {
             const root = this.attachShadow({ mode: 'open' });
@@ -345,10 +356,10 @@
               this.requestValidation();
               this.#syncError();
             });
-            this.#input.addEventListener('blur', () => {
-              this.#touched = true;
-              this.#syncError();
-            });
+            // `touched` itself is tracked by the mixin (focusout on the
+            // host); this listener only re-renders the error text once it
+            // flips.
+            this.#input.addEventListener('blur', () => this.#syncError());
 
             this.requestValidation();
           }
@@ -360,13 +371,12 @@
           }
 
           #syncError() {
-            this.#input.classList.toggle('invalid', !this.validity.valid);
-            this.#error.textContent =
-              this.#touched && !this.validity.valid ? this.validationMessage : '';
+            const touched = this.internals.states.has('touched');
+            this.#error.textContent = touched && !this.validity.valid ? this.validationMessage : '';
           }
 
           reportValidity() {
-            this.#touched = true;
+            this.internals.states.add('touched');
             this.#syncError();
             return super.reportValidity();
           }
@@ -380,8 +390,8 @@
           }
 
           formResetCallback() {
+            super.formResetCallback();
             this.value = '';
-            this.#touched = false;
             this.requestValidation();
             this.#syncError();
           }
