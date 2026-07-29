@@ -1,5 +1,10 @@
 # form-control-mixin
 
+[![npm version](https://img.shields.io/npm/v/form-control-mixin.svg)](https://www.npmjs.com/package/form-control-mixin)
+[![npm downloads](https://img.shields.io/npm/dm/form-control-mixin.svg)](https://www.npmjs.com/package/form-control-mixin)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/form-control-mixin)](https://bundlephobia.com/package/form-control-mixin)
+[![license](https://img.shields.io/npm/l/form-control-mixin.svg)](LICENSE)
+
 A small, framework-agnostic mixin for building **form-associated custom
 elements** on top of the native [`ElementInternals`](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals) API.
 
@@ -39,6 +44,22 @@ customElements.define('my-input', MyInput);
 `new FormData(form).get('nickname')` and native constraint validation UI
 (`:invalid`, `reportValidity()`, browser validation bubbles) work out of the box.
 
+## What you get
+
+- **No framework, no renderer.** It's a mixin over `HTMLElement`, so it works
+  in a plain custom element, Lit, Stencil, FAST — and the resulting element
+  drops into React, Vue, Angular, Svelte or plain HTML like any other custom
+  element.
+- **~3 KB gzipped, zero runtime dependencies.** No bundled polyfill, no
+  assumed rendering layer.
+- **TypeScript types shipped** (`dist/index.d.ts`), ESM only.
+- **Nine built-in validators** mirroring native constraint semantics, plus a
+  three-property interface for your own.
+- **`:state()` styling out of the box** — `valid`, `invalid`, `touched`,
+  `dirty` exposed as custom states, no attribute reflection.
+- **Tested on real engines.** The suite runs in Chromium, Firefox and WebKit
+  via Playwright, not a DOM shim.
+
 ## Demo
 
 Live: **https://korial29.github.io/form-control-mixin/demo/**
@@ -63,10 +84,7 @@ finished API. Bigger component libraries (Shoelace, Ionic, FAST) solved the
 same problem, but only inside their own codebase &mdash; not as something you
 can install if you're building your own design system.
 
-This package is deliberately: framework-agnostic (a mixin, not tied to Lit
-or any renderer), small (no bundled polyfill, no assumed rendering layer),
-and tested against real Chromium, Firefox, and WebKit engines rather than a
-DOM shim.
+So this fills the gap: the `ElementInternals` plumbing, on its own, installable.
 
 ## Install
 
@@ -144,9 +162,10 @@ what CI runs).
 
 ## Status
 
-Early (`0.1.0`). Core mixin, built-in validators, and a cross-browser test suite
-are in place. Not yet published to npm.
+Published on npm and in use. The core mixin, the built-in validators, the custom
+states and the cross-browser test suite are in place; the API is not expected to
+churn from here.
 
-⚠ To actually publish, the GitHub repo needs an `NPM_PUBLISH_TOKEN` secret and a
-`release` environment (with required reviewers) configured manually — that part
-can't be done from here.
+## License
+
+[MIT](LICENSE) © Ludovic Dupont

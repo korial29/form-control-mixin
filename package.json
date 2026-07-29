@@ -1,7 +1,7 @@
 {
   "name": "form-control-mixin",
-  "version": "0.1.0",
-  "description": "Framework-agnostic mixin for building form-associated custom elements on top of the native ElementInternals API.",
+  "version": "1.1.0",
+  "description": "Framework-agnostic mixin for form-associated custom elements: native form submission, validation and reset, with built-in validators, on top of ElementInternals.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -19,7 +19,7 @@
     "type": "git",
     "url": "https://github.com/korial29/form-control-mixin.git"
   },
-  "homepage": "https://github.com/korial29/form-control-mixin#readme",
+  "homepage": "https://korial29.github.io/form-control-mixin/demo/",
   "bugs": {
     "url": "https://github.com/korial29/form-control-mixin/issues"
   },
@@ -39,11 +39,31 @@
     "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
-    "web-components",
-    "custom-elements",
+    "form-control-mixin",
     "form-associated",
+    "form-associated-custom-element",
+    "form-control",
+    "form",
+    "forms",
+    "form-validation",
+    "validation",
+    "validator",
+    "constraint-validation",
     "elementinternals",
-    "form-validation"
+    "element-internals",
+    "attachinternals",
+    "customstateset",
+    "custom-state",
+    "web-component",
+    "web-components",
+    "custom-element",
+    "custom-elements",
+    "shadow-dom",
+    "mixin",
+    "design-system",
+    "framework-agnostic",
+    "lit",
+    "typescript"
   ],
   "license": "MIT",
   "author": "Ludovic Dupont",
