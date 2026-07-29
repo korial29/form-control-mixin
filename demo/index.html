@@ -214,6 +214,54 @@
           ></profile-field-pattern>
         </div>
 
+        <div class="field">
+          <div class="field-label">
+            <label for="email">Email</label>
+            <span class="rule">type: email</span>
+          </div>
+          <profile-field-email
+            id="email"
+            name="email"
+            placeholder="ada@example.com"
+          ></profile-field-email>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="website">Website</label>
+            <span class="rule">type: url</span>
+          </div>
+          <profile-field-url
+            id="website"
+            name="website"
+            placeholder="https://example.com"
+          ></profile-field-url>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="age">Age</label>
+            <span class="rule">min 18</span>
+          </div>
+          <profile-field-min id="age" name="age" placeholder="18"></profile-field-min>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="rating">Rating</label>
+            <span class="rule">max 5</span>
+          </div>
+          <profile-field-max id="rating" name="rating" placeholder="5"></profile-field-max>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="quantity">Quantity</label>
+            <span class="rule">step 5</span>
+          </div>
+          <profile-field-step id="quantity" name="quantity" placeholder="10"></profile-field-step>
+        </div>
+
         <div class="actions">
           <button type="submit">Submit</button>
           <button type="reset">Reset</button>
@@ -230,6 +278,11 @@
         minLengthValidator,
         maxLengthValidator,
         patternValidator,
+        emailValidator,
+        urlValidator,
+        minValidator,
+        maxValidator,
+        stepValidator,
       } from '../dist/index.js';
 
       const fieldStyles = `
@@ -237,6 +290,7 @@
           display: block;
         }
         input {
+          box-sizing: border-box;
           font: inherit;
           width: 100%;
           padding: 0.55rem 0.75rem;
@@ -268,7 +322,7 @@
        * lifecycle wiring, parameterized by the validator set that defines what
        * "valid" means for that one field.
        */
-      function defineProfileField(tagName, validators) {
+      function defineProfileField(tagName, validators, inputType = 'text') {
         class ProfileField extends FormControlMixin(HTMLElement, { validators }) {
           static observedAttributes = ['placeholder'];
 
@@ -280,7 +334,7 @@
             const root = this.attachShadow({ mode: 'open' });
             const style = document.createElement('style');
             style.textContent = fieldStyles;
-            this.#input.type = 'text';
+            this.#input.type = inputType;
             this.#input.placeholder = this.getAttribute('placeholder') ?? '';
             this.#error.className = 'error';
             this.#error.setAttribute('aria-live', 'polite');
@@ -342,6 +396,11 @@
       defineProfileField('profile-field-pattern', [
         patternValidator(/^\d{5}$/, 'Use a 5-digit postal code.'),
       ]);
+      defineProfileField('profile-field-email', [emailValidator], 'email');
+      defineProfileField('profile-field-url', [urlValidator], 'url');
+      defineProfileField('profile-field-min', [minValidator(18)], 'number');
+      defineProfileField('profile-field-max', [maxValidator(5)], 'number');
+      defineProfileField('profile-field-step', [stepValidator(5)], 'number');
 
       const form = document.getElementById('demo-form');
       const output = document.getElementById('output');
