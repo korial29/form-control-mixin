@@ -2,46 +2,274 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>form-control-mixin demo</title>
     <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #f3f4f8;
+        --card-bg: #ffffff;
+        --text: #1a1d29;
+        --muted: #6b7280;
+        --border: #d9dbe3;
+        --accent: #6355ff;
+        --accent-contrast: #ffffff;
+        --danger: #e0304a;
+        --danger-bg: #fdeced;
+        --ok: #1f9d63;
+        --radius: 14px;
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #14151c;
+          --card-bg: #1d1f2b;
+          --text: #edeef5;
+          --muted: #9598ab;
+          --border: #33364a;
+          --danger-bg: #3a1620;
+          --ok: #4fd58a;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: system-ui, sans-serif;
-        max-width: 32rem;
-        margin: 3rem auto;
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        justify-content: center;
+        padding: 3rem 1.5rem;
       }
-      demo-input {
+
+      main {
+        width: 100%;
+        max-width: 30rem;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        margin: 0 0 0.5rem;
+      }
+
+      .intro {
+        color: var(--muted);
+        font-size: 0.925rem;
+        line-height: 1.5;
+        margin: 0 0 2rem;
+      }
+
+      .intro code {
+        background: var(--border);
+        padding: 0.1rem 0.35rem;
+        border-radius: 4px;
+        font-size: 0.85em;
+      }
+
+      .card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 1.75rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+      }
+
+      .field {
+        margin-block-end: 1.375rem;
+      }
+
+      .field:last-of-type {
+        margin-block-end: 0;
+      }
+
+      .field-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-block-end: 0.4rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+      }
+
+      .field-label .rule {
+        font-weight: 400;
+        color: var(--muted);
+        font-size: 0.8rem;
+      }
+
+      profile-field {
         display: block;
-        margin-block-end: 1rem;
       }
-      demo-input:invalid {
-        outline: 2px solid crimson;
+
+      .actions {
+        display: flex;
+        gap: 0.75rem;
+        margin-block-start: 1.75rem;
       }
+
+      button {
+        font: inherit;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border-radius: 999px;
+        padding: 0.6rem 1.4rem;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+          transform 0.05s ease,
+          opacity 0.15s ease;
+      }
+
+      button:active {
+        transform: scale(0.97);
+      }
+
+      button[type='submit'] {
+        background: var(--accent);
+        color: var(--accent-contrast);
+      }
+
+      button[type='reset'] {
+        background: transparent;
+        color: var(--text);
+        border-color: var(--border);
+      }
+
       pre {
-        background: #f3f3f3;
-        padding: 1rem;
-        border-radius: 6px;
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 1rem 1.25rem;
+        border-radius: var(--radius);
+        font-size: 0.85rem;
+        overflow-x: auto;
+        margin-block-start: 1.5rem;
       }
     </style>
   </head>
   <body>
-    <h1>form-control-mixin</h1>
-    <p>
-      <code>&lt;demo-input&gt;</code> is a plain <code>HTMLElement</code> (no
-      framework) that fully participates in the form below: it submits its
-      value, resets with the form, and reports native validity &mdash; all via
-      <code>ElementInternals</code>.
-    </p>
+    <main>
+      <h1>form-control-mixin</h1>
+      <p class="intro">
+        Each field below is a plain <code>HTMLElement</code> (no framework) fully participating in
+        the native form via <code>ElementInternals</code> &mdash; one field per built-in validator.
+      </p>
 
-    <form id="demo-form">
-      <label>
-        Nickname (required, 3-10 chars)
-        <demo-input name="nickname" placeholder="e.g. ludo"></demo-input>
-      </label>
-      <button type="submit">Submit</button>
-      <button type="reset">Reset</button>
-    </form>
+      <form class="card" id="demo-form" novalidate>
+        <div class="field">
+          <div class="field-label">
+            <label for="full-name">Full name</label>
+            <span class="rule">required</span>
+          </div>
+          <profile-field-required
+            id="full-name"
+            name="fullName"
+            placeholder="Ada Lovelace"
+          ></profile-field-required>
+        </div>
 
-    <pre id="output">Submitted values will appear here.</pre>
+        <div class="field">
+          <div class="field-label">
+            <label for="username">Username</label>
+            <span class="rule">min 3 characters</span>
+          </div>
+          <profile-field-minlength
+            id="username"
+            name="username"
+            placeholder="ada"
+          ></profile-field-minlength>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="bio">Bio</label>
+            <span class="rule">max 60 characters</span>
+          </div>
+          <profile-field-maxlength
+            id="bio"
+            name="bio"
+            placeholder="Mathematician & writer"
+          ></profile-field-maxlength>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="postal-code">Postal code</label>
+            <span class="rule">pattern: 5 digits</span>
+          </div>
+          <profile-field-pattern
+            id="postal-code"
+            name="postalCode"
+            placeholder="75001"
+          ></profile-field-pattern>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="email">Email</label>
+            <span class="rule">type: email</span>
+          </div>
+          <profile-field-email
+            id="email"
+            name="email"
+            placeholder="ada@example.com"
+          ></profile-field-email>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="website">Website</label>
+            <span class="rule">type: url</span>
+          </div>
+          <profile-field-url
+            id="website"
+            name="website"
+            placeholder="https://example.com"
+          ></profile-field-url>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="age">Age</label>
+            <span class="rule">min 18</span>
+          </div>
+          <profile-field-min id="age" name="age" placeholder="18"></profile-field-min>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="rating">Rating</label>
+            <span class="rule">max 5</span>
+          </div>
+          <profile-field-max id="rating" name="rating" placeholder="5"></profile-field-max>
+        </div>
+
+        <div class="field">
+          <div class="field-label">
+            <label for="quantity">Quantity</label>
+            <span class="rule">step 5</span>
+          </div>
+          <profile-field-step id="quantity" name="quantity" placeholder="10"></profile-field-step>
+        </div>
+
+        <div class="actions">
+          <button type="submit">Submit</button>
+          <button type="reset">Reset</button>
+        </div>
+      </form>
+
+      <pre id="output">Submitted values will appear here.</pre>
+    </main>
 
     <script type="module">
       import {
@@ -49,55 +277,144 @@
         requiredValidator,
         minLengthValidator,
         maxLengthValidator,
+        patternValidator,
+        emailValidator,
+        urlValidator,
+        minValidator,
+        maxValidator,
+        stepValidator,
       } from '../dist/index.js';
 
-      class DemoInput extends FormControlMixin(HTMLElement, {
-        validators: [requiredValidator, minLengthValidator(3), maxLengthValidator(10)],
-      }) {
-        static observedAttributes = ['placeholder'];
+      const fieldStyles = `
+        :host {
+          display: block;
+        }
+        input {
+          box-sizing: border-box;
+          font: inherit;
+          width: 100%;
+          padding: 0.55rem 0.75rem;
+          border-radius: 10px;
+          border: 1px solid var(--border, #d9dbe3);
+          background: color-mix(in srgb, var(--card-bg, #fff) 100%, transparent);
+          color: var(--text, #1a1d29);
+          transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        input:focus-visible {
+          outline: none;
+          border-color: var(--accent, #6355ff);
+          box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6355ff) 25%, transparent);
+        }
+        input.invalid {
+          border-color: var(--danger, #e0304a);
+        }
+        .error {
+          display: block;
+          min-height: 1.1em;
+          margin-block-start: 0.35rem;
+          font-size: 0.8rem;
+          color: var(--danger, #e0304a);
+        }
+      `;
 
-        #input = document.createElement('input');
+      /**
+       * Factory for a form-associated field: shared shadow-DOM rendering +
+       * lifecycle wiring, parameterized by the validator set that defines what
+       * "valid" means for that one field.
+       */
+      function defineProfileField(tagName, validators, inputType = 'text') {
+        class ProfileField extends FormControlMixin(HTMLElement, { validators }) {
+          static observedAttributes = ['placeholder'];
 
-        connectedCallback() {
-          const root = this.attachShadow({ mode: 'open' });
-          root.appendChild(this.#input);
-          this.#input.addEventListener('input', () => {
-            this.value = this.#input.value;
+          #input = document.createElement('input');
+          #error = document.createElement('small');
+          #touched = false;
+
+          connectedCallback() {
+            const root = this.attachShadow({ mode: 'open' });
+            const style = document.createElement('style');
+            style.textContent = fieldStyles;
+            this.#input.type = inputType;
+            this.#input.placeholder = this.getAttribute('placeholder') ?? '';
+            this.#error.className = 'error';
+            this.#error.setAttribute('aria-live', 'polite');
+            root.append(style, this.#input, this.#error);
+
+            this.#input.addEventListener('input', () => {
+              this.value = this.#input.value;
+              this.requestValidation();
+              this.#syncError();
+            });
+            this.#input.addEventListener('blur', () => {
+              this.#touched = true;
+              this.#syncError();
+            });
+
             this.requestValidation();
-            this.reportValidity();
-          });
-          this.requestValidation();
+          }
+
+          attributeChangedCallback(name, _old, value) {
+            if (name === 'placeholder' && this.#input) {
+              this.#input.placeholder = value ?? '';
+            }
+          }
+
+          #syncError() {
+            this.#input.classList.toggle('invalid', !this.validity.valid);
+            this.#error.textContent =
+              this.#touched && !this.validity.valid ? this.validationMessage : '';
+          }
+
+          reportValidity() {
+            this.#touched = true;
+            this.#syncError();
+            return super.reportValidity();
+          }
+
+          get value() {
+            return this.#input.value;
+          }
+
+          set value(v) {
+            this.#input.value = v ?? '';
+          }
+
+          formResetCallback() {
+            this.value = '';
+            this.#touched = false;
+            this.requestValidation();
+            this.#syncError();
+          }
         }
 
-        attributeChangedCallback(name, _old, value) {
-          if (name === 'placeholder') this.#input.placeholder = value ?? '';
-        }
-
-        get value() {
-          return this.#input.value;
-        }
-
-        set value(v) {
-          this.#input.value = v ?? '';
-        }
-
-        formResetCallback() {
-          this.value = '';
-          this.requestValidation();
-        }
+        customElements.define(tagName, ProfileField);
       }
 
-      customElements.define('demo-input', DemoInput);
+      defineProfileField('profile-field-required', [requiredValidator]);
+      defineProfileField('profile-field-minlength', [minLengthValidator(3)]);
+      defineProfileField('profile-field-maxlength', [maxLengthValidator(60)]);
+      defineProfileField('profile-field-pattern', [
+        patternValidator(/^\d{5}$/, 'Use a 5-digit postal code.'),
+      ]);
+      defineProfileField('profile-field-email', [emailValidator], 'email');
+      defineProfileField('profile-field-url', [urlValidator], 'url');
+      defineProfileField('profile-field-min', [minValidator(18)], 'number');
+      defineProfileField('profile-field-max', [maxValidator(5)], 'number');
+      defineProfileField('profile-field-step', [stepValidator(5)], 'number');
 
       const form = document.getElementById('demo-form');
       const output = document.getElementById('output');
-      form.addEventListener('submit', (event) => {
+
+      form.addEventListener('submit', event => {
         event.preventDefault();
-        output.textContent = JSON.stringify(
-          Object.fromEntries(new FormData(form)),
-          null,
-          2,
-        );
+        const valid = [...form.elements]
+          .filter(el => typeof el.reportValidity === 'function')
+          .every(el => el.reportValidity());
+        if (!valid) {
+          output.textContent = 'Fix the highlighted fields before submitting.';
+          return;
+        }
+        output.textContent = JSON.stringify(Object.fromEntries(new FormData(form)), null, 2);
       });
     </script>
   </body>

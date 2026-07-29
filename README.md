@@ -92,9 +92,12 @@ own by implementing `{ key, message, isValid(host, value) }`.
 
 ## Demo
 
+Live: **https://korial29.github.io/form-control-mixin/demo/**
+
+Locally:
+
 ```sh
-npm run build
-npx http-server . -o /demo/
+npm run dev
 ```
 
 ## Contributing
