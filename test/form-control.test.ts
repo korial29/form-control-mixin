@@ -14,6 +14,7 @@ class TestInput extends FormControlMixin(HTMLElement, {
   }
 
   formResetCallback(): void {
+    super.formResetCallback();
     this.value = '';
     this.requestValidation();
   }
@@ -128,5 +129,41 @@ describe('FormControlMixin', () => {
     expect(input.restoredMode).to.equal('restore');
     expect(input.value).to.equal('abcd');
     expect(input.validity.valid).to.be.true;
+  });
+
+  describe('custom states', () => {
+    it('reflects validity as :state(valid) / :state(invalid)', () => {
+      const { input } = renderInForm();
+      expect(input.internals.states.has('invalid')).to.be.true;
+      expect(input.internals.states.has('valid')).to.be.false;
+
+      input.value = 'abcd';
+      input.requestValidation();
+      expect(input.internals.states.has('valid')).to.be.true;
+      expect(input.internals.states.has('invalid')).to.be.false;
+    });
+
+    it('sets :state(dirty) once the value diverges from its baseline, clears it on reset', () => {
+      const { form, input } = renderInForm();
+      expect(input.internals.states.has('dirty')).to.be.false;
+
+      input.value = 'abcd';
+      input.requestValidation();
+      expect(input.internals.states.has('dirty')).to.be.true;
+
+      form.reset();
+      expect(input.internals.states.has('dirty')).to.be.false;
+    });
+
+    it('sets :state(touched) on focusout and clears it on form reset', () => {
+      const { form, input } = renderInForm();
+      expect(input.internals.states.has('touched')).to.be.false;
+
+      input.dispatchEvent(new FocusEvent('focusout', { bubbles: true, composed: true }));
+      expect(input.internals.states.has('touched')).to.be.true;
+
+      form.reset();
+      expect(input.internals.states.has('touched')).to.be.false;
+    });
   });
 });

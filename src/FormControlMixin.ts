@@ -2,6 +2,12 @@ import type { FormValue, Validator } from './types.js';
 
 type Constructor<T = object> = new (...args: any[]) => T;
 
+// Sentinel distinguishing "no value observed yet" from a legitimate `null`
+// value, used to capture the dirty-tracking baseline on the first
+// requestValidation() call (constructor time is too early: subclass field
+// initializers, e.g. `value = ''`, run after `super(...)` returns).
+const NO_BASELINE = Symbol('no-baseline');
+
 export interface FormControlConfig {
   /** Name of the host property holding the current form value. Defaults to "value". */
   valueProperty?: string;
@@ -63,10 +69,17 @@ export function FormControlMixin<T extends Constructor<HTMLElement>>(
     static readonly formAssociated = true;
 
     #internals: ElementInternals;
+    #baseline: FormValue | typeof NO_BASELINE = NO_BASELINE;
 
     constructor(...args: any[]) {
       super(...args);
       this.#internals = this.attachInternals();
+      // `focusout` (unlike `focus`/`blur`) bubbles and is composed, so this
+      // fires regardless of whether the host itself or a shadow-DOM
+      // descendant holds focus.
+      this.addEventListener('focusout', () => {
+        this.#internals.states.add('touched');
+      });
     }
 
     get internals(): ElementInternals {
@@ -118,6 +131,7 @@ export function FormControlMixin<T extends Constructor<HTMLElement>>(
       const value = (this as unknown as Record<string, FormValue>)[valueProperty] ?? null;
       this.#internals.setFormValue(value);
 
+      let matched = false;
       for (const validator of validators) {
         if (!validator.isValid(this as unknown as HTMLElement, value)) {
           const message =
@@ -125,11 +139,42 @@ export function FormControlMixin<T extends Constructor<HTMLElement>>(
               ? validator.message(this as unknown as HTMLElement)
               : validator.message;
           this.setValidity({ [validator.key]: true } as Partial<ValidityStateFlags>, message);
-          return;
+          matched = true;
+          break;
         }
       }
 
-      this.setValidity({});
+      if (!matched) {
+        this.setValidity({});
+      }
+
+      this.#syncCustomStates(value);
+    }
+
+    /**
+     * Keeps `internals.states` in sync so consumers can style the host from
+     * outside via `:state(valid)`, `:state(invalid)`, `:state(touched)`, and
+     * `:state(dirty)` &mdash; no attribute reflection required.
+     *
+     * `dirty` compares against the value seen on the first call, since a
+     * subclass's own field initializers (e.g. `value = ''`) run after
+     * `super()` returns and are therefore not visible from the constructor.
+     */
+    #syncCustomStates(value: FormValue): void {
+      const states = this.#internals.states;
+
+      if (this.validity.valid) {
+        states.add('valid');
+        states.delete('invalid');
+      } else {
+        states.add('invalid');
+        states.delete('valid');
+      }
+
+      if (this.#baseline === NO_BASELINE) {
+        this.#baseline = value;
+      }
+      states[value === this.#baseline ? 'delete' : 'add']('dirty');
     }
 
     /** Override to react when the element is (dis)associated from a form. */
@@ -138,8 +183,17 @@ export function FormControlMixin<T extends Constructor<HTMLElement>>(
     /** Override to reflect a disabled ancestor `<fieldset>` on the host. */
     formDisabledCallback(_disabled: boolean): void {}
 
-    /** Override to reset the host's own value property on form reset. */
-    formResetCallback(): void {}
+    /**
+     * Override to reset the host's own value property on form reset.
+     * Clears the `touched` custom state; call `super.formResetCallback()`
+     * first if you override this to keep that behavior. `dirty` needs no
+     * such call &mdash; it's recomputed from scratch on the next
+     * `requestValidation()`, which a `formResetCallback` override typically
+     * calls anyway.
+     */
+    formResetCallback(): void {
+      this.#internals.states.delete('touched');
+    }
 
     /** Override to restore value on bfcache navigation / autofill. */
     formStateRestoreCallback(
