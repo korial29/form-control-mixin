@@ -39,6 +39,16 @@ customElements.define('my-input', MyInput);
 `new FormData(form).get('nickname')` and native constraint validation UI
 (`:invalid`, `reportValidity()`, browser validation bubbles) work out of the box.
 
+## Demo
+
+Live: **https://korial29.github.io/form-control-mixin/demo/**
+
+Locally:
+
+```sh
+npm run dev
+```
+
 ## Why this exists
 
 Form-associated custom elements have been broadly supported since 2023
@@ -89,16 +99,6 @@ declares (empty, override-friendly) `formAssociatedCallback`,
 mirror native `required`, `minlength`, `maxlength`, `pattern`,
 `type="email"`, `type="url"`, `min`, `max`, and `step` semantics. Write your
 own by implementing `{ key, message, isValid(host, value) }`.
-
-## Demo
-
-Live: **https://korial29.github.io/form-control-mixin/demo/**
-
-Locally:
-
-```sh
-npm run dev
-```
 
 ## Contributing
 
