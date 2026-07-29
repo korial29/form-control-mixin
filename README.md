@@ -91,6 +91,32 @@ declares (empty, override-friendly) `formAssociatedCallback`,
 `formDisabledCallback`, `formResetCallback`, and
 `formStateRestoreCallback` hooks.
 
+### Custom states
+
+`requestValidation()` also keeps `internals.states` (a
+[`CustomStateSet`](https://developer.mozilla.org/en-US/docs/Web/API/CustomStateSet))
+in sync, so any consumer can style the host from the outside with the
+[`:state()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:state) pseudo-class
+&mdash; no attribute reflection needed:
+
+```css
+my-input:state(invalid) {
+  outline: 2px solid crimson;
+}
+my-input:state(touched):state(invalid) {
+  /* only after the user has actually interacted with the field */
+}
+```
+
+- `valid` / `invalid` &mdash; mirrors `validity.valid`.
+- `touched` &mdash; set on the first `focusout` of the host (or any shadow-DOM
+  descendant); cleared by `formResetCallback` (call `super.formResetCallback()`
+  if you override it, to keep this in sync).
+- `dirty` &mdash; set once the value diverges from the value seen on the first
+  `requestValidation()` call; needs no explicit reset since it's recomputed
+  every call &mdash; a `formResetCallback` override that resets the value and
+  calls `requestValidation()` clears it automatically.
+
 ### Built-in validators
 
 `requiredValidator`, `minLengthValidator(n)`, `maxLengthValidator(n)`,
